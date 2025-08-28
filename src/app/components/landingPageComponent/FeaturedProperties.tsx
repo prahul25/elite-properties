@@ -1,7 +1,7 @@
 "use client";
 import React, { useMemo, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Heart, MapPin, Star, ArrowRight, Search } from "lucide-react";
+import { motion, easeInOut, AnimatePresence } from "framer-motion";
+import {  Star, ArrowRight } from "lucide-react";
 
 const data = [
   {
@@ -60,12 +60,17 @@ const data = [
   },
 ];
 
+const transitionConfig = {
+  duration: 0.6,
+  ease: easeInOut,  // Using the correct easing function
+};
+
 const containerVariants = {
-  hidden: { opacity: 0, y: 10 },
+  hidden: { opacity: 0, y: 20 },
   show: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, ease: "easeOut" },
+    transition: transitionConfig,
   },
 };
 

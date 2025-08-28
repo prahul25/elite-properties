@@ -1,120 +1,111 @@
 "use client";
 import React from "react";
-import { motion } from "framer-motion";
-import { MapPin, Shield, User, DollarSign } from "lucide-react";
+import { motion, easeInOut } from "framer-motion";
+import { MapPin, User, DollarSign, Headphones } from "lucide-react";
+
+// Animation config
+const transitionConfig = {
+  duration: 0.6,
+  ease: easeInOut,
+};
 
 const containerVariants = {
-  hidden: { opacity: 0, y: 10 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: "easeOut" },
-  },
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: transitionConfig },
 };
 
 const boxVariants = {
-  hidden: { opacity: 0, y: 20 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6 },
-  },
-};
-
-const textVariants = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { duration: 0.6, delay: 0.3 } },
+  hidden: { opacity: 0, y: 30 },
+  show: { opacity: 1, y: 0, transition: transitionConfig },
 };
 
 const points = [
   {
     icon: <MapPin className="h-6 w-6 text-indigo-500" />,
     title: "Local Expertise",
-    description: "Deep knowledge of local markets and neighborhoods to help you make informed decisions.",
+    description:
+      "Deep knowledge of local markets and neighborhoods to help you make informed decisions.",
   },
   {
-    icon: <User className="h-6 w-6 text-green-500" />,
+    icon: <User className="h-6 w-6 text-blue-500" />,
     title: "Trusted Advisors",
-    description: "Honest guidance and transparent communication throughout the process.",
+    description:
+      "Honest guidance and transparent communication throughout the process.",
+  },
+  {
+    icon: <Headphones className="h-6 w-6 text-purple-500" />,
+    title: "Personalized Service",
+    description:
+      "Tailored approach to meet your specific needs and preferences.",
   },
   {
     icon: <DollarSign className="h-6 w-6 text-yellow-500" />,
     title: "Investment Expertise",
-    description: "Strategic advice to maximize your property investment returns.",
+    description:
+      "Strategic advice to maximize your property investment returns.",
   },
 ];
 
 export default function WhyChooseUs() {
   return (
-    <section className="py-16 bg-white">
-      <div className="mx-auto max-w-7xl px-6 sm:px-8">
-        {/* Header */}
+    <section className="py-16 bg-gradient-to-b from-white to-slate-50/60">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+        {/* Flex Container */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="show"
-          viewport={{ once: true, amount: 0.4 }}
-          className="text-center mb-12"
-        >
-          <h2 className="text-4xl font-semibold text-gray-900">Why Choose Us</h2>
-          <p className="mt-3 text-lg text-gray-600">
-            With over 15 years of experience in the real estate market, we provide personalized service tailored to your unique needs.
-          </p>
-          <div className="mx-auto mt-6 h-px w-24 bg-gradient-to-r from-transparent via-indigo-400 to-transparent opacity-60" />
-        </motion.div>
-
-        {/* Flex Section with Image and Points */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.2 }}
+          viewport={{ once: true, amount: 0.3 }}
           className="flex flex-col lg:flex-row items-center gap-12"
         >
-          {/* Left: Image Section */}
+          {/* Left: Image */}
           <motion.div
             variants={boxVariants}
-            className="flex justify-center lg:justify-start"
+            className="relative rounded-lg overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300"
           >
-            <motion.img
-              src="/whyChoseUs.png" // Replace this with the correct path to the image in your public folder
-              alt="Person"
-              className="rounded-xl shadow-xl max-w-sm transition-transform duration-500 hover:scale-105"
+            <img
+              src="/whyChoseUs.png"
+              alt="Team member"
+              className="rounded-lg shadow-xl max-w-sm lg:max-w-md transition-transform duration-500 hover:scale-105"
             />
           </motion.div>
 
-          {/* Right: Text Section */}
+          {/* Right: Content */}
           <motion.div
             variants={boxVariants}
-            className="space-y-6 text-center lg:text-left flex-1"
+            className="flex-1 space-y-6 lg:space-y-8"
           >
-            <motion.h3
-              variants={textVariants}
-              className="text-2xl font-semibold text-gray-900"
-            >
-              Our team of experts is committed to helping you achieve your real estate goals.
-            </motion.h3>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Why Choose Us
+            </h2>
+            <p className="text-lg text-gray-600 leading-relaxed mb-8">
+              With over 15 years of experience in the real estate market, we
+              provide personalized service tailored to your unique needs
+            </p>
 
-            {/* Points List */}
-            <motion.div
-              variants={textVariants}
-              className="grid gap-8 sm:grid-cols-2 lg:grid-cols-1"
-            >
+            {/* Feature Points */}
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2">
               {points.map((point, index) => (
                 <motion.div
                   key={index}
-                  className="flex items-center gap-4 p-6 border border-gray-200 rounded-xl shadow-lg hover:shadow-xl transition duration-300"
+                  variants={boxVariants}
+                  whileHover={{ scale: 1.05, y: -5 }}
+                  className="flex items-start gap-4 p-6 border border-gray-200 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:border-indigo-500"
                 >
                   <div className="p-4 bg-indigo-100 rounded-full">
                     {point.icon}
                   </div>
                   <div>
-                    <h4 className="font-semibold text-lg text-gray-900">{point.title}</h4>
-                    <p className="mt-2 text-sm text-gray-600">{point.description}</p>
+                    <h4 className="font-semibold text-lg text-gray-900">
+                      {point.title}
+                    </h4>
+                    <p className="mt-2 text-sm text-gray-600">
+                      {point.description}
+                    </p>
                   </div>
                 </motion.div>
               ))}
-            </motion.div>
+            </div>
           </motion.div>
         </motion.div>
       </div>
