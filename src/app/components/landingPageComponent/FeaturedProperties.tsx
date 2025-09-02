@@ -2,6 +2,7 @@
 import React, { useMemo, useState } from "react";
 import { motion, easeInOut, AnimatePresence } from "framer-motion";
 import {  Star, ArrowRight } from "lucide-react";
+import Image from "next/image";
 
 const data = [
   {
@@ -136,11 +137,15 @@ function PropertyCard({
 
       {/* Media */}
       <div className="relative h-64 overflow-hidden">
-        <img
-          src={image}
-          alt={title}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.06]"
-        />
+        <Image
+  src={image}
+  alt={title}
+  layout="fill"
+  objectFit="cover"
+  className="transition-transform duration-500 group-hover:scale-[1.06]"
+  sizes="100"
+/>
+
 
         {/* Top-left tags */}
         <div className="absolute left-4 top-4 flex flex-wrap gap-2">
