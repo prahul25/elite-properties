@@ -1,3 +1,4 @@
+import ContactUs from "./components/landingPageComponent/ContactUs";
 import FeaturedProperties from "./components/landingPageComponent/FeaturedProperties";
 import Footer from "./components/landingPageComponent/Footer";
 import Hero from "./components/landingPageComponent/Hero";
@@ -14,6 +15,7 @@ export default function Home() {
     <Services/>
     <FeaturedProperties/>
     <WhyChooseUs/>
+    <ContactUs/>
     <Footer/>
     </>
   );
