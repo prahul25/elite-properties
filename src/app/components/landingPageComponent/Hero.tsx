@@ -122,17 +122,19 @@ const locations = [
           </div>
 
           {/* Property Type Dropdown */}
-          <select
-            value={propertyType}
-            onChange={handlePropertyTypeChange}
-            className="w-full sm:w-60 px-6 py-3 rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-600 transition-all duration-300 ease-in-out backdrop-blur-md"
-          >
-            <option value="All">All Properties</option>
-            <option value="House">House</option>
-            <option value="Office">Office</option>
-          </select>
+ <select
+  value={propertyType}
+  onChange={handlePropertyTypeChange}
+  className="w-full sm:w-60 px-6 py-3 rounded-lg border-2 border-blue-600 
+             focus:ring-2 focus:ring-blue-500 focus:border-blue-600
+             transition-all duration-300 ease-in-out
+             bg-black/50 text-white"
+>
+  <option value="All">All Properties</option>
+  <option value="House">House</option>
+  <option value="Office">Office</option>
+</select>
 
-          
 
           {/* Price Range Dropdown */}
           <select
