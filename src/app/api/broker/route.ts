@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
-
 import bcrypt from "bcryptjs";
 import BrokerModel from "@/models/Broker";
+import { generateTokens } from "@/utils/generateTokens";
 
-// ✅ POST: Register a new broker
 export async function POST(req: Request) {
   try {
     await dbConnect();
@@ -12,7 +11,6 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { name, email, phone, password } = body;
 
-    // ✅ Basic validation
     if (!name || !email || !phone || !password) {
       return NextResponse.json(
         { error: "All fields (name, email, phone, password) are required" },
@@ -20,10 +18,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // ✅ Check if broker already exists
-    const existingBroker = await BrokerModel.findOne({
-      $or: [{ email }, { phone }],
-    });
+    const existingBroker = await BrokerModel.findOne({ $or: [{ email }, { phone }] });
     if (existingBroker) {
       return NextResponse.json(
         { error: "Broker with this email or phone already exists" },
@@ -31,10 +26,8 @@ export async function POST(req: Request) {
       );
     }
 
-    // ✅ Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // ✅ Create new broker
     const broker = await BrokerModel.create({
       name,
       email,
@@ -43,24 +36,26 @@ export async function POST(req: Request) {
       properties: [],
     });
 
+    // ✅ issue tokens on sign-up
+    const { accessToken, refreshToken } = generateTokens(broker.id.toString());
+
     return NextResponse.json(
-      { message: "Broker registered successfully", broker },
+      {
+        message: "Broker registered successfully",
+        broker: {
+          _id: broker._id,
+          name: broker.name,
+          email: broker.email,
+          phone: broker.phone,
+        },
+        tokens: { accessToken, refreshToken },
+      },
       { status: 201 }
     );
   } catch (err: unknown) {
-  if (err instanceof Error) {
-    console.error("POST /api/brokers error:", err.message);
     return NextResponse.json(
-      { error: err.message },
+      { error: err instanceof Error ? err.message : "Failed to register broker" },
       { status: 500 }
     );
   }
-  // fallback for non-Error cases
-  console.error("POST /api/brokers unknown error:", err);
-  return NextResponse.json(
-    { error: "Failed to register broker" },
-    { status: 500 }
-  );
-}
-
 }
