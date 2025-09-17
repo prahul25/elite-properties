@@ -3,6 +3,7 @@ import dbConnect from "@/lib/dbConnect";
 import bcrypt from "bcryptjs";
 import BrokerModel from "@/models/Broker";
 import { generateTokens } from "@/utils/generateTokens";
+import SessionModel from "@/models/Session";
 
 export async function POST(req: Request) {
   try {
@@ -39,6 +40,11 @@ export async function POST(req: Request) {
     // ✅ issue tokens on sign-up
     const { accessToken, refreshToken } = generateTokens(broker.id.toString());
 
+     await SessionModel.create({
+      brokerId: broker._id,
+      refreshToken,
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+    });
     return NextResponse.json(
       {
         message: "Broker registered successfully",

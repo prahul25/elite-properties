@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import BrokerModel from "@/models/Broker";
 
 import { generateTokens } from "@/utils/generateTokens";
+import SessionModel from "@/models/Session";
 
 // ✅ POST: Login broker
 export async function POST(req: Request) {
@@ -11,19 +12,19 @@ export async function POST(req: Request) {
     await dbConnect();
 
     const body = await req.json();
-    const { emailOrPhone, password } = body;
+     const { email, phone, password } = body;
 
-    if (!emailOrPhone || !password) {
+    if ((!email && !phone) || !password) {
       return NextResponse.json(
-        { error: "Email/Phone and password are required" },
+        { error: "Email or phone and password are required" },
         { status: 400 }
       );
     }
 
     // ✅ Find broker by email OR phone
-    const broker = await BrokerModel.findOne({
-      $or: [{ email: emailOrPhone }, { phone: emailOrPhone }],
-    });
+    const broker = await BrokerModel.findOne(
+      email ? { email } : { phone }
+    )
 
     if (!broker) {
       return NextResponse.json(
@@ -44,14 +45,16 @@ export async function POST(req: Request) {
     // ✅ Generate tokens
     const { accessToken, refreshToken } = generateTokens(broker.id.toString());
 
-    // ✅ Save refresh token in Session collection
-    // await SessionModel.create({
-    //   brokerId: broker._id,
-    //   refreshToken,
-    //   userAgent: req.headers.get("user-agent") || undefined,
-    //   ipAddress: req.headers.get("x-forwarded-for") || undefined,
-    //   expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
-    // });
+// ✅ new - update if exists, otherwise create
+await SessionModel.findOneAndUpdate(
+  { brokerId: broker._id }, // match existing session
+  {
+    refreshToken,
+    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+  },
+  { upsert: true, new: true } // create if not exists
+);
+
 
     return NextResponse.json(
       {

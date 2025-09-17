@@ -5,7 +5,6 @@ dotenv.config({ path: ".env.local" });
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET! ;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET! ;
 
-console.log([ACCESS_TOKEN_SECRET,REFRESH_TOKEN_SECRET],"GGGG")
 export function generateTokens(brokerId: string) {
   const accessToken = jwt.sign(
     { brokerId },
