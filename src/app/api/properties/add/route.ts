@@ -2,23 +2,29 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
 import BrokerModel from "@/models/Broker";
 import PropertyModel from "@/models/Property";
+import { uploadImage } from "@/utils/uploadImage";
 
 // ✅ POST: Add new property
 export async function POST(req: Request) {
   try {
     await dbConnect();
 
-    const body = await req.json();
-    const {
-      title,
-      transactionType,
-      propertyType,
-      price,
-      location,
-      details,
-      images,
-      brokerId,
-    } = body;
+    const formData = await req.formData();
+
+    // ✅ Extract text fields from formData
+    const title = formData.get("title") as string;
+    const transactionType = formData.get("transactionType") as string;
+    const propertyType = formData.get("propertyType") as string;
+    const price = Number(formData.get("price"));
+    const brokerId = formData.get("brokerId") as string;
+
+    // ✅ Parse nested objects (location, details)
+    const location = JSON.parse(formData.get("location") as string || "{}");
+    const details = JSON.parse(formData.get("details") as string || "{}");
+
+    // ✅ Handle file uploads
+    const files = formData.getAll("images") as File[];
+    const imageUrls = await Promise.all(files.map(file => uploadImage(file)));
 
     // ✅ Required fields check
     if (
@@ -55,7 +61,7 @@ export async function POST(req: Request) {
       price,
       location,
       details,
-      images,
+      images: imageUrls,
       brokerId,
     });
 
