@@ -47,7 +47,7 @@ const PropertySchema: Schema<Property> = new mongoose.Schema(
     location: {
       city: { type: String, required: [true, "City is required"] },
       area: { type: String, required: [true, "Area is required"] },
-      state: { type: String, default: "Gujarat" },
+      state: { type: String },
     },
 
     details: {

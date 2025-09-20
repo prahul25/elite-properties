@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     // ✅ Handle file uploads
     const files = formData.getAll("images") as File[];
     const imageUrls = await Promise.all(files.map(file => uploadImage(file)));
-
+const status = formData.get("status") as "Active" | "Sold" | "Rented";
     // ✅ Required fields check
     if (
       !title ||
@@ -63,6 +63,7 @@ export async function POST(req: Request) {
       details,
       images: imageUrls,
       brokerId,
+      status
     });
 
     // ✅ Add property reference to broker
