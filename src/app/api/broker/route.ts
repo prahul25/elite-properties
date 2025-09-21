@@ -21,11 +21,19 @@ export async function POST(req: Request) {
 
     const existingBroker = await BrokerModel.findOne({ $or: [{ email }, { phone }] });
     if (existingBroker) {
-      return NextResponse.json(
-        { error: "Broker with this email or phone already exists" },
-        { status: 400 }
-      );
-    }
+  if (existingBroker.email === email) {
+    return NextResponse.json(
+      { error: "This email address is already registered. Please use a different email" },
+      { status: 400 }
+    );
+  }
+  if (existingBroker.phone === phone) {
+    return NextResponse.json(
+      { error: "This phone number is already registered. Please use a different phone number" },
+      { status: 400 }
+    );
+  }
+}
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
