@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
 import PropertyModel from "@/models/Property";
-
+import "@/models/Broker";
 export async function GET() {
   try {
     await dbConnect();

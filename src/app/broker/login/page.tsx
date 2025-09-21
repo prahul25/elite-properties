@@ -1,9 +1,9 @@
 "use client";
 import { useState } from "react";
-// import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function BrokerLoginPage() {
-//   const router = useRouter();
+  const router = useRouter();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -37,8 +37,8 @@ console.log(process.env.NEXT_PUBLIC_API_URL,"CHECKING")
       // Save tokens
       localStorage.setItem("accessToken", data.tokens.accessToken);
       localStorage.setItem("refreshToken", data.tokens.refreshToken);
-
-    //   router.push("/dashboard");
+      localStorage.setItem("brokerInfo", JSON.stringify(data.broker));
+      router.push(`/broker/add-property?brokerId=${data.broker._id}`);
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);

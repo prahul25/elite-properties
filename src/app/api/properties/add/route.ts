@@ -25,21 +25,28 @@ export async function POST(req: Request) {
     // ✅ Handle file uploads
     const files = formData.getAll("images") as File[];
     const imageUrls = await Promise.all(files.map(file => uploadImage(file)));
-const status = formData.get("status") as "Active" | "Sold" | "Rented";
+const status = (formData.get("status") as
+      | "Active"
+      | "Sold"
+      | "Rented") || "Active";
     // ✅ Required fields check
-    if (
-      !title ||
-      !transactionType ||
-      !propertyType ||
-      !price ||
-      !location?.city ||
-      !location?.area ||
-      !details?.carpetArea ||
-      !details?.furnished ||
-      !brokerId
-    ) {
+    const missingFields: string[] = [];
+
+    if (!title) missingFields.push("title");
+    if (!transactionType) missingFields.push("transactionType");
+    if (!propertyType) missingFields.push("propertyType");
+    if (!price) missingFields.push("price");
+    if (!brokerId) missingFields.push("brokerId");
+
+    if (!location?.city) missingFields.push("location.city");
+    if (!location?.area) missingFields.push("location.area");
+
+    if (!details?.carpetArea) missingFields.push("details.carpetArea");
+    if (!details?.furnished) missingFields.push("details.furnished");
+
+    if (missingFields.length > 0) {
       return NextResponse.json(
-        { error: "Missing required fields" },
+        { error: "Missing required fields", fields: missingFields },
         { status: 400 }
       );
     }

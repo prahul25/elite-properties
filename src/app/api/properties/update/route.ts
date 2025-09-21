@@ -26,7 +26,14 @@ export async function PUT(req: Request) {
     // ✅ Handle new images (optional)
     const files = formData.getAll("images") as File[];
     const imageUrls = await Promise.all(files.map(file => uploadImage(file)));
-const status = formData.get("status") as "Active" | "Sold" | "Rented";
+// ✅ Handle status safely
+const rawStatus = formData.get("status");
+let status: "Active" | "Sold" | "Rented" | undefined;
+
+if (typeof rawStatus === "string" && ["Active", "Sold", "Rented"].includes(rawStatus)) {
+  status = rawStatus as "Active" | "Sold" | "Rented";
+}
+
     // ✅ Validate ID
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json({ error: "Invalid property ID" }, { status: 400 });
@@ -41,10 +48,12 @@ const status = formData.get("status") as "Active" | "Sold" | "Rented";
       location,
       details,
       images:imageUrls,
-      status
+    
     };
 
-
+if (status) {
+  updateData.status = status;
+}
 
     // ✅ Find and update property
     const updatedProperty = await PropertyModel.findByIdAndUpdate(id, updateData, {
