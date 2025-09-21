@@ -22,7 +22,7 @@ export default function BrokerLoginPage() {
     e.preventDefault();
     setLoading(true);
     setError("");
-
+console.log(process.env.NEXT_PUBLIC_API_URL,"CHECKING")
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
         method: "POST",

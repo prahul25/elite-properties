@@ -23,7 +23,7 @@ export default function BrokerSignupPage() {
     e.preventDefault();
     setLoading(true);
     setError("");
-
+console.log(process.env.NEXT_PUBLIC_API_URL,"CHECKING")
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/broker`,
         
