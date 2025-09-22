@@ -1,109 +1,80 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 export default function BrokerLoginPage() {
-  const [phone, setPhone] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const router = useRouter();
+  const [formData, setFormData] = useState({ phone: "", password: "" });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    setLoading(true);
-
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, password }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Login failed");
-
-      localStorage.setItem("accessToken", data.tokens.accessToken);
-      localStorage.setItem("refreshToken", data.tokens.refreshToken);
-
-      router.push(`/dashboard?brokerId=${data.broker._id}`);
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
-    } finally {
-      setLoading(false);
-    }
+    // TODO: integrate login API
   };
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left side graphic */}
-      <div className="hidden md:flex w-1/2 bg-gradient-to-br from-blue-600 to-blue-800 items-center justify-center text-white p-12">
-        <div className="text-center max-w-md">
-          <h1 className="text-4xl font-bold mb-4">Welcome Back, Broker!</h1>
-          <p className="text-lg mb-6">
-            Log in to manage your properties and connect with potential buyers and renters.
-          </p>
-          {/* <img
-            src="/broker-login-graphic.svg"
-            alt="Broker illustration"
-            className="mx-auto w-80"
-          /> */}
-        </div>
+    <div className="flex h-screen bg-gradient-to-r from-[#FFF4ED] to-white">
+      {/* Left Illustration Section */}
+      <div className="hidden md:flex w-1/2 items-center justify-center p-10">
+        <Image
+          src="/illustrations/broker-login.png"
+          alt="Broker Login Illustration"
+          width={550}
+          height={550}
+          priority
+        />
       </div>
 
-      {/* Right side form */}
-      <div className="flex-1 flex items-center justify-center bg-gray-50 px-6">
-        <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8">
-          <h2 className="text-2xl font-bold text-center mb-6">Broker Login</h2>
+      {/* Right Form Section */}
+      <div className="w-full md:w-1/2 flex items-center justify-center">
+        <div className="w-full max-w-md p-10 bg-white rounded-2xl shadow-xl border border-gray-100">
+          <h2 className="text-4xl font-extrabold text-gray-800 text-center">
+            Welcome Back 👋
+          </h2>
+          <p className="text-center text-gray-500 mt-2 mb-8">
+            Login to manage and list your properties
+          </p>
 
-          {error && (
-            <div className="bg-red-100 text-red-700 px-4 py-2 rounded mb-4 text-sm">
-              {error}
-            </div>
-          )}
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <input
+              type="text"
+              name="phone"
+              placeholder="Phone number"
+              value={formData.phone}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+            />
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Phone Number</label>
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                required
-                className="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                placeholder="Enter your phone number"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                placeholder="Enter your password"
-              />
-            </div>
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+            />
 
             <button
               type="submit"
-              disabled={loading}
-              className="w-full bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 transition disabled:opacity-50"
+              className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-medium shadow-md"
             >
-              {loading ? "Logging in..." : "Login"}
+              Login
             </button>
           </form>
 
-          {/* Signup Link */}
           <p className="text-center text-sm text-gray-600 mt-6">
-            New to Broks?{" "}
-            <Link href="/broker/signup" className="text-blue-600 font-medium hover:underline">
-              Register as a Broker
+            New here?{" "}
+            <Link
+              href="/broker/signup"
+              className="text-blue-600 hover:underline font-semibold"
+            >
+              Register as Broker
             </Link>
           </p>
         </div>
