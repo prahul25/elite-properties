@@ -22,21 +22,25 @@ export default function Navbar() {
           <Link href="/" className="hover:text-blue-600 transition">
             Home
           </Link>
-          <Link href="/pages/properties" className="hover:text-blue-600 transition">
+          <Link href="/properties" className="hover:text-blue-600 transition">
             Properties
           </Link>
-          <Link href="/pages/services" className="hover:text-blue-600 transition">
+          <Link href="/services" className="hover:text-blue-600 transition">
             Services
           </Link>
-          <Link href="/pages/about" className="hover:text-blue-600 transition">
+          <Link href="/about" className="hover:text-blue-600 transition">
             About
           </Link>
-          <Link
-            href="/pages/contact"
-            className="ml-6 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
-          >
-            Contact Us
-          </Link>
+
+          {/* Primary CTA for brokers */}
+          <div className="ml-6">
+            <Link
+              href="/broker/login"
+              className="bg-blue-600 text-white px-5 py-2 rounded-lg font-medium hover:bg-blue-700 transition"
+            >
+              Sell / Rent Property
+            </Link>
+          </div>
         </div>
 
         {/* Mobile Menu Button */}
@@ -54,21 +58,23 @@ export default function Navbar() {
           <Link href="/" className="block hover:text-blue-600" onClick={toggleMenu}>
             Home
           </Link>
-          <Link href="/pages/properties" className="block hover:text-blue-600" onClick={toggleMenu}>
+          <Link href="/properties" className="block hover:text-blue-600" onClick={toggleMenu}>
             Properties
           </Link>
-          <Link href="/pages/services" className="block hover:text-blue-600" onClick={toggleMenu}>
+          <Link href="/services" className="block hover:text-blue-600" onClick={toggleMenu}>
             Services
           </Link>
-          <Link href="/pages/about" className="block hover:text-blue-600" onClick={toggleMenu}>
+          <Link href="/about" className="block hover:text-blue-600" onClick={toggleMenu}>
             About
           </Link>
+
+          {/* Mobile CTA */}
           <Link
-            href="/pages/contact"
-            className="block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-center"
+            href="/broker/login"
+            className="block bg-blue-600 text-white px-5 py-2 rounded-lg font-medium hover:bg-blue-700 transition text-center"
             onClick={toggleMenu}
           >
-            Contact Us
+            Sell / Rent Property
           </Link>
         </div>
       )}
