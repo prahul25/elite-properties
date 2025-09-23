@@ -79,7 +79,7 @@ console.log(process.env.NEXT_PUBLIC_API_URL,"CHECKING")
           required
         />
 
-        <input
+        {/* <input
           type="email"
           name="email"
           placeholder="Email"
@@ -87,7 +87,7 @@ console.log(process.env.NEXT_PUBLIC_API_URL,"CHECKING")
           onChange={handleChange}
           className="w-full border rounded px-4 py-2 mb-4"
           required
-        />
+        /> */}
 
         <input
           type="tel"

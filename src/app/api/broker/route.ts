@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
 import bcrypt from "bcryptjs";
-import BrokerModel from "@/models/Broker";
+import BrokerModel, { Broker } from "@/models/Broker";
 import { generateTokens } from "@/utils/generateTokens";
 import SessionModel from "@/models/Session";
+import { FilterQuery } from "mongoose";
 
 export async function POST(req: Request) {
   try {
@@ -12,14 +13,18 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { name, email, phone, password } = body;
 
-    if (!name || !email || !phone || !password) {
+    if (!name || !phone || !password) {
       return NextResponse.json(
-        { error: "All fields (name, email, phone, password) are required" },
+        { error: "All fields (name, phone, password) are required" },
         { status: 400 }
       );
     }
 
-    const existingBroker = await BrokerModel.findOne({ $or: [{ email }, { phone }] });
+    const query: FilterQuery<Broker> = { $or: [{ phone }] };
+if (email) query.$or!.push({ email });
+
+const existingBroker = await BrokerModel.findOne(query);
+
     if (existingBroker) {
   if (existingBroker.email === email) {
     return NextResponse.json(
@@ -39,7 +44,7 @@ export async function POST(req: Request) {
 
     const broker = await BrokerModel.create({
       name,
-      email,
+      email : email || null,
       phone,
       password: hashedPassword,
       properties: [],

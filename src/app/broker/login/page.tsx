@@ -12,9 +12,31 @@ export default function BrokerLoginPage() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    // TODO: integrate login API
-  };
+  e.preventDefault();
+
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.error || "Login failed");
+
+    // Save tokens
+    localStorage.setItem("accessToken", data.tokens.accessToken);
+    localStorage.setItem("refreshToken", data.tokens.refreshToken);
+
+    // Redirect to broker dashboard
+    window.location.href = `/properties`;
+  } catch (err) {
+    console.error("Login error:", err);
+    alert(err instanceof Error ? err.message : "Something went wrong");
+  }
+};
+
 
   return (
     <div className="flex h-screen bg-gradient-to-r from-[#FFF4ED] to-white">

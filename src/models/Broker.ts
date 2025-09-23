@@ -3,7 +3,7 @@ import mongoose, { Document, Schema } from "mongoose";
 // ✅ Interface for Broker
 export interface Broker extends Document {
   name: string;
-  email: string;
+  email?: string;
   phone: string;
   password: string; // hashed password
   properties: mongoose.Types.ObjectId[]; // references to Property documents
@@ -18,7 +18,8 @@ const BrokerSchema: Schema<Broker> = new mongoose.Schema(
 
     email: {
       type: String,
-      required: [true, "Email is required"],
+      // required: [true, "Email is required"],
+      default:null,
       unique: true,
       match: [/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, "Please provide a valid email address"],
     },
