@@ -45,8 +45,8 @@ export default function BrokerLoginPage() {
         <Image
           src="/illustrations/broker-login.png"
           alt="Broker Login Illustration"
-          width={550}
-          height={550}
+          width={700}
+          height={700}
           priority
         />
       </div>
