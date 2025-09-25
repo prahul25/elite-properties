@@ -117,7 +117,7 @@ function Rating({ value }: { value: number }) {
 }
 
 function PropertyCard({
-  id,
+  
   title,
   image,
   price,
@@ -191,7 +191,7 @@ function PropertyCard({
 }
 
 export default function FeaturedProperties() {
-  const [query, setQuery] = useState("");
+  const [query] = useState("");
   const properties = data;
 
   const filtered = useMemo(() => {
