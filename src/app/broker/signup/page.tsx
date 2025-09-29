@@ -35,6 +35,8 @@ export default function BrokerSignupPage() {
 
       localStorage.setItem("accessToken", data.tokens.accessToken);
       localStorage.setItem("refreshToken", data.tokens.refreshToken);
+
+      window.location.href = `/broker/add-property`;
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
@@ -135,7 +137,7 @@ export default function BrokerSignupPage() {
         />
       </div>
 
-      {/* Right Form */}
+      
       
     </div>
   );

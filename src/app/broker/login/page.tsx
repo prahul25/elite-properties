@@ -15,7 +15,7 @@ export default function BrokerLoginPage() {
   e.preventDefault();
 
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
+    const res = await fetch(`/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData),
@@ -29,8 +29,8 @@ export default function BrokerLoginPage() {
     localStorage.setItem("accessToken", data.tokens.accessToken);
     localStorage.setItem("refreshToken", data.tokens.refreshToken);
 
-    // Redirect to broker dashboard
-    window.location.href = `/properties`;
+    // Redirect to Add Property Page
+    window.location.href = `/broker/add-property`;
   } catch (err) {
     console.error("Login error:", err);
     alert(err instanceof Error ? err.message : "Something went wrong");
