@@ -15,7 +15,7 @@ export default function BrokerLoginPage() {
   e.preventDefault();
 
   try {
-    const res = await fetch(`/api/auth/login`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData),
@@ -28,6 +28,8 @@ export default function BrokerLoginPage() {
     // Save tokens
     localStorage.setItem("accessToken", data.tokens.accessToken);
     localStorage.setItem("refreshToken", data.tokens.refreshToken);
+    localStorage.setItem("brokerId", data.broker._id);
+
 
     // Redirect to Add Property Page
     window.location.href = `/broker/add-property`;

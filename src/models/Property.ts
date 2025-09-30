@@ -21,6 +21,7 @@ export interface Property extends Document {
     description?: string; // optional text (cabins, pantry etc.)
   };
 
+  coverImage: string;
   images: string[];
   brokerId: mongoose.Types.ObjectId;
 
@@ -60,8 +61,16 @@ const PropertySchema: Schema<Property> = new mongoose.Schema(
       bhk: { type: Number }, // only for homes
       description: { type: String }, // office/shop notes
     },
-
-    images: [{ type: String }],
+    coverImage: { type: String, required: [true, "Cover image is required"] },
+    images: {
+      type: [String],
+      validate: {
+        validator: function (arr: string[]) {
+          return arr.length <= 5;
+        },
+        message: "You can upload up to 5 images only",
+      },
+    },
 
     brokerId: {
       type: mongoose.Schema.Types.ObjectId,

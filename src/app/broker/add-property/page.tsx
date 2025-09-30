@@ -1,13 +1,13 @@
 "use client";
-import { Suspense, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { RxCross2 } from "react-icons/rx";
 import Image from "next/image";
 
 function AddPropertyForm() {
-  const searchParams = useSearchParams();
-  const brokerId = searchParams.get("brokerId");
+
+  const [brokerId,setBrokerId] = useState<string | null>(null)
   const router = useRouter();
 
   const [loading, setLoading] = useState(false);
@@ -111,6 +111,11 @@ function AddPropertyForm() {
       setLoading(false);
     }
   };
+  useEffect(() => {
+  const id = localStorage.getItem("brokerId");
+  if (id) setBrokerId(id);
+}, []);
+
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100 px-4">
