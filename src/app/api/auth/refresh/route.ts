@@ -3,15 +3,16 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import dbConnect from "@/lib/dbConnect";
 import SessionModel from "@/models/Session";
 import { generateTokens } from "@/utils/generateTokens";
+import { cookies } from "next/headers";
 
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET!;
 
-export async function POST(req: Request) {
+export async function POST() {
   try {
     await dbConnect();
 
-    // ✅ get refresh token from request (body, header, or cookie)
-    const { refreshToken } = await req.json();
+ const cookieStore = await cookies();
+  const refreshToken = cookieStore.get("refreshToken")?.value;
 
     if (!refreshToken) {
       return NextResponse.json({ error: "Refresh token required" }, { status: 400 });
@@ -46,10 +47,16 @@ export async function POST(req: Request) {
     session.expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     await session.save();
 
-    return NextResponse.json(
-      { message: "Token refreshed successfully", tokens: { accessToken, refreshToken: newRefreshToken } },
-      { status: 200 }
-    );
+    const response = NextResponse.json({ accessToken }, { status: 200 });
+    response.cookies.set("refreshToken", newRefreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+      maxAge: 7 * 24 * 60 * 60,
+    });
+
+    return response;
   } catch (err: unknown) {
     return NextResponse.json(
       { error: err instanceof Error ? err.message : "Failed to refresh token" },

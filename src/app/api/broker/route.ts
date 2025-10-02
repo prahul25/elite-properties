@@ -58,7 +58,8 @@ const existingBroker = await BrokerModel.findOne(query);
       refreshToken,
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
     });
-    return NextResponse.json(
+    // ✅ Response with HttpOnly cookie for refreshToken
+    const response = NextResponse.json(
       {
         message: "Broker registered successfully",
         broker: {
@@ -67,10 +68,20 @@ const existingBroker = await BrokerModel.findOne(query);
           email: broker.email,
           phone: broker.phone,
         },
-        tokens: { accessToken, refreshToken },
+        accessToken, // ✅ only return accessToken (refresh in cookie)
       },
       { status: 201 }
     );
+
+    response.cookies.set("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+      maxAge: 7 * 24 * 60 * 60, // 7 days
+    });
+
+    return response;
   } catch (err: unknown) {
     return NextResponse.json(
       { error: err instanceof Error ? err.message : "Failed to register broker" },

@@ -26,8 +26,8 @@ export default function BrokerLoginPage() {
     if (!res.ok) throw new Error(data.error || "Login failed");
 
     // Save tokens
-    localStorage.setItem("accessToken", data.tokens.accessToken);
-    localStorage.setItem("refreshToken", data.tokens.refreshToken);
+    localStorage.setItem("accessToken", data.accessToken);
+    // localStorage.setItem("refreshToken", data.tokens.refreshToken);
     localStorage.setItem("brokerId", data.broker._id);
 
 

@@ -56,7 +56,8 @@ await SessionModel.findOneAndUpdate(
 );
 
 
-    return NextResponse.json(
+    // ✅ Response with HttpOnly cookie for refreshToken
+    const response = NextResponse.json(
       {
         message: "Login successful",
         broker: {
@@ -65,10 +66,20 @@ await SessionModel.findOneAndUpdate(
           email: broker.email,
           phone: broker.phone,
         },
-        tokens: { accessToken, refreshToken },
+        accessToken ,
       },
       { status: 200 }
     );
+
+    response.cookies.set("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+      maxAge: 7 * 24 * 60 * 60, // 7 days
+    });
+
+    return response;
   } catch (err: unknown) {
     return NextResponse.json(
       { error: err instanceof Error ? err.message : "Login failed" },
