@@ -19,7 +19,7 @@ const BrokerSchema: Schema<Broker> = new mongoose.Schema(
     email: {
       type: String,
       // required: [true, "Email is required"],
-      default:null,
+      sparse: true,
       unique: true,
       match: [/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, "Please provide a valid email address"],
     },
