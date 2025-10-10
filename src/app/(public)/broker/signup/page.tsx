@@ -34,7 +34,7 @@ export default function BrokerSignupPage() {
       if (!res.ok) throw new Error(data.error || "Registration failed");
 
       localStorage.setItem("accessToken", data.accessToken);
-      localStorage.setItem("refreshToken", data.refreshToken);
+      localStorage.setItem("brokerId", data._id);
 
       window.location.href = `/broker/add-property`;
     } catch (err: unknown) {
