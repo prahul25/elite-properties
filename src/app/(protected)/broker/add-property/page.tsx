@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { RxCross2 } from "react-icons/rx";
 import Image from "next/image";
+import { uploadToCloudinaryClient } from "@/utils/uploadToCloudinaryClient";
 
 function AddPropertyForm() {
 
@@ -48,69 +49,77 @@ function AddPropertyForm() {
   // };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
+  e.preventDefault();
+  setLoading(true);
+  setError("");
 
-    try {
-      if (!brokerId) throw new Error("Broker ID missing in URL");
+  try {
+    if (!brokerId) throw new Error("Broker ID missing in URL");
 
-      const form = new FormData();
-      form.append("title", formData.title);
-      form.append("transactionType", formData.transactionType);
-      form.append("price", formData.price);
+    // -------------------------------
+    // 1️⃣ Upload images to Cloudinary (client side)
+    // -------------------------------
+    let coverImageUrl = "";
+    let galleryUrls: string[] = [];
 
-      // Residential only
-      if (activeType === "residential") {
-        form.append("propertyType", formData.propertyType);
-        form.append("bhk", formData.bhk);
-      }
-
-      // Commercial only (no propertyType / bhk)
-      if (activeType === "commercial") {
-        form.append("propertyType", "Commercial");
-      }
-
-      form.append(
-        "location",
-        JSON.stringify({
-          city: formData.city,
-          area: formData.area,
-          state: formData.state,
-        })
-      );
-
-      form.append(
-        "details",
-        JSON.stringify({
-          carpetArea: formData.carpetArea,
-          furnished: formData.furnished,
-          description: formData.description,
-        })
-      );
-
-      if (formData.coverImage) {
-        form.append("coverImage", formData.coverImage);
-      }
-      formData.galleryImages.forEach((file) => form.append("images", file));
-
-      form.append("brokerId", brokerId);
-
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/properties/add`, {
-        method: "POST",
-        body: form,
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to add property");
-
-      router.push("/properties");
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
-    } finally {
-      setLoading(false);
+    if (formData.coverImage) {
+      coverImageUrl = await uploadToCloudinaryClient(formData.coverImage);
     }
-  };
+
+    if (formData.galleryImages.length > 0) {
+      galleryUrls = await Promise.all(
+        formData.galleryImages.map((file) => uploadToCloudinaryClient(file))
+      );
+    }
+
+    // -------------------------------
+    // 2️⃣ Build payload for backend
+    // -------------------------------
+    const payload = {
+      title: formData.title,
+      transactionType: formData.transactionType,
+      propertyType:
+        activeType === "commercial" ? "Commercial" : formData.propertyType,
+      price: Number(formData.price),
+      brokerId,
+      location: {
+        city: formData.city,
+        area: formData.area,
+        state: formData.state,
+      },
+      details: {
+        carpetArea: formData.carpetArea,
+        furnished: formData.furnished,
+        description: formData.description,
+        bhk: formData.bhk,
+      },
+      coverImage: coverImageUrl,
+      images: galleryUrls,
+      status: "Active",
+    };
+
+    // -------------------------------
+    // 3️⃣ Send property details to backend
+    // -------------------------------
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/properties/add`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed to add property");
+
+    // -------------------------------
+    // 4️⃣ Navigate after success
+    // -------------------------------
+    router.push("/properties");
+  } catch (err: unknown) {
+    setError(err instanceof Error ? err.message : "Something went wrong");
+  } finally {
+    setLoading(false);
+  }
+};
   useEffect(() => {
   const id = localStorage.getItem("brokerId");
   if (id) setBrokerId(id);

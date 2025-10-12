@@ -64,7 +64,7 @@ export default function PropertiesPage() {
               className="border rounded-lg shadow-md overflow-hidden hover:shadow-xl transition"
             >
               <Image
-  src={property.images[0] || "/placeholder.jpg"}
+  src={property.images[0]}
   alt={property.title}
   width={400}
   height={300}
