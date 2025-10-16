@@ -32,10 +32,7 @@ export async function GET(
       PropertyModel.find({ brokerId: id })
         .sort({ createdAt: -1 })
         .skip(skip)
-        .limit(limit)
-        .select(
-          "_id title price transactionType propertyType city area images status createdAt"
-        ),
+        .limit(limit),
       PropertyModel.countDocuments({ brokerId: id }),
     ]);
 

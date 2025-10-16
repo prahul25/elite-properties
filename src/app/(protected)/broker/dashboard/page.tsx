@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 interface Broker {
   _id: string;
@@ -38,15 +39,13 @@ export default function BrokerDashboardPage() {
   const [pagination, setPagination] = useState<Pagination | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const router = useRouter();
 
-  // ✅ Safely read broker ID from localStorage after hydration
   useEffect(() => {
     try {
       const storedBrokerId = localStorage.getItem("brokerId");
- 
       if (storedBrokerId) {
-        if (storedBrokerId) setBrokerId(storedBrokerId);
-        else throw new Error("Invalid broker data in localStorage");
+        setBrokerId(storedBrokerId);
       } else {
         setError("Broker not logged in or localStorage empty");
         setLoading(false);
@@ -56,25 +55,20 @@ export default function BrokerDashboardPage() {
       setError("Failed to read broker ID");
       setLoading(false);
     }
-  }, []); // ✅ runs once only (no dependency)
+  }, []);
 
-  // ✅ Fetch broker info + properties when brokerId is ready
   useEffect(() => {
-    if (!brokerId) return; // wait until brokerId is set
+    if (!brokerId) return;
 
     const fetchBrokerData = async () => {
       try {
         setLoading(true);
         setError("");
 
-        // 🟦 Fetch broker info
-        const brokerRes = await fetch(`/api/broker/info/${brokerId}`, {
-          cache: "no-store",
-        });
+        const brokerRes = await fetch(`/api/broker/info/${brokerId}`, { cache: "no-store" });
         const brokerData = await brokerRes.json();
         if (!brokerData.success) throw new Error(brokerData.message);
 
-        // 🟩 Fetch broker's listed properties
         const propertyRes = await fetch(
           `/api/broker/properties/${brokerId}?page=${page}&limit=6`,
           { cache: "no-store" }
@@ -86,59 +80,78 @@ export default function BrokerDashboardPage() {
         setProperties(propertyData.properties);
         setPagination(propertyData.pagination);
       } catch (err: unknown) {
-  console.error(err);
-  const message = err instanceof Error ? err.message : "Failed to load data";
-  setError(message);
-}
- finally {
+        console.error(err);
+        const message = err instanceof Error ? err.message : "Failed to load data";
+        setError(message);
+      } finally {
         setLoading(false);
       }
     };
 
     fetchBrokerData();
-  }, [brokerId, page]); // ✅ brokerId is a proper dependency now
+  }, [brokerId, page]);
 
-  // 🟨 Loading State
   if (loading)
     return (
-      <div className="flex justify-center items-center h-screen text-gray-400">
+      <div className="flex justify-center items-center h-screen text-gray-500">
         Loading dashboard...
       </div>
     );
 
-  // 🟥 Error State
   if (error)
     return (
-      <div className="flex justify-center items-center h-screen text-red-500">
+      <div className="flex justify-center items-center h-screen text-red-600">
         {error}
       </div>
     );
 
-  // 🟩 Render UI
+  // 🧩 Generate initials for avatar
+  const initials =
+    broker?.name
+      ?.split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase() || "B";
+
   return (
-    <div className="min-h-screen bg-gray-950 text-white px-6 py-8">
-      {/* Broker Info Section */}
+    <div className="min-h-screen bg-gray-50 text-gray-900 px-6 py-8">
+      {/* 🔹 Top Broker Info Bar */}
       {broker && (
-        <div className="bg-gray-900 rounded-xl p-6 shadow-md mb-8">
-          <h2 className="text-2xl font-semibold mb-2">{broker.name}</h2>
-          <p className="text-gray-300">📞 {broker.phone}</p>
-          {broker.email && <p className="text-gray-300">📧 {broker.email}</p>}
+        <div className="flex justify-between items-center bg-white rounded-xl p-6 shadow-md mb-10 border border-gray-200">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 flex items-center justify-center rounded-full bg-blue-600 text-white text-xl font-semibold shadow-sm">
+              {initials}
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold">{broker.name}</h2>
+              <p className="text-sm text-gray-500">{broker.phone}</p>
+            </div>
+          </div>
+
+          <button
+            onClick={() => router.push("/broker/add-property")}
+            className="bg-blue-600 text-white px-5 py-2 rounded-lg font-medium hover:bg-blue-700 transition"
+          >
+            + Add Property
+          </button>
         </div>
       )}
 
-      {/* Property List Section */}
+      {/* 🔸 Properties Section */}
       <div>
-        <h3 className="text-xl font-semibold mb-4">Your Listed Properties</h3>
+        <h3 className="text-2xl font-semibold mb-6">Your Listed Properties</h3>
 
         {properties.length === 0 ? (
-          <p className="text-gray-400">No properties listed yet.</p>
+          <p className="text-gray-500 text-center mt-10">
+            No properties listed yet.
+          </p>
         ) : (
           <>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {properties.map((p) => (
                 <div
                   key={p._id}
-                  className="bg-gray-800 rounded-lg overflow-hidden shadow-md"
+                  className="bg-white rounded-xl shadow-md hover:shadow-lg transition border border-gray-200 overflow-hidden"
                 >
                   <div className="relative w-full h-48">
                     <Image
@@ -147,51 +160,58 @@ export default function BrokerDashboardPage() {
                       fill
                       sizes="(max-width: 768px) 100vw, 33vw"
                       className="object-cover"
-                      priority={false}
                     />
                   </div>
+
                   <div className="p-4">
                     <h4 className="text-lg font-semibold mb-1">{p.title}</h4>
-                    <p className="text-gray-400 text-sm">
+                    <p className="text-sm text-gray-500">
                       {p.propertyType} • {p.transactionType}
                     </p>
-                    <p className="text-gray-300 text-sm">
-                      {p.city}, {p.area}
+                    <p className="text-sm text-gray-600 mt-1">
+                      {p.area}, {p.city}
                     </p>
-                    <p className="text-blue-400 font-bold mt-2">
+                    <p className="text-blue-600 font-semibold mt-3">
                       ₹{p.price.toLocaleString()}
                     </p>
-                    <p
-                      className={`text-sm mt-2 ${
-                        p.status === "Available"
-                          ? "text-green-400"
-                          : "text-red-400"
-                      }`}
-                    >
-                      {p.status}
-                    </p>
+                    <div className="flex justify-between items-center mt-3">
+                      <span
+                        className={`text-xs font-semibold px-3 py-1 rounded-full ${
+                          p.status === "Active"
+                            ? "bg-green-100 text-green-700"
+                            : "bg-gray-200 text-gray-600"
+                        }`}
+                      >
+                        {p.status}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {p.createdAt
+                          ? new Date(p.createdAt).toLocaleDateString()
+                          : ""}
+                      </span>
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
 
-            {/* Pagination Controls */}
+            {/* 🔻 Pagination */}
             {pagination && (
-              <div className="flex justify-center items-center gap-4 mt-8">
+              <div className="flex justify-center items-center gap-4 mt-10">
                 <button
                   disabled={pagination.currentPage === 1}
                   onClick={() => setPage(page - 1)}
-                  className="px-3 py-1 bg-gray-700 rounded disabled:opacity-40"
+                  className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50 hover:bg-gray-300 transition"
                 >
                   Prev
                 </button>
-                <span className="text-gray-300">
+                <span className="text-gray-600">
                   Page {pagination.currentPage} of {pagination.totalPages}
                 </span>
                 <button
                   disabled={pagination.currentPage === pagination.totalPages}
                   onClick={() => setPage(page + 1)}
-                  className="px-3 py-1 bg-gray-700 rounded disabled:opacity-40"
+                  className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50 hover:bg-gray-300 transition"
                 >
                   Next
                 </button>
