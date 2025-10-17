@@ -36,7 +36,7 @@ export default function BrokerSignupPage() {
       localStorage.setItem("accessToken", data.accessToken);
       localStorage.setItem("brokerId", data._id);
 
-      window.location.href = `/broker/add-property`;
+      window.location.href = `/broker/dashboard`;
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {

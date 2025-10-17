@@ -32,7 +32,7 @@ export default function BrokerLoginPage() {
 
 
     // Redirect to Add Property Page
-    window.location.href = `/broker/add-property`;
+    window.location.href = `/broker/dashboard`;
   } catch (err) {
     console.error("Login error:", err);
     alert(err instanceof Error ? err.message : "Something went wrong");
