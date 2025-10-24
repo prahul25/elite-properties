@@ -12,6 +12,8 @@ export default function BrokerSignupPage() {
     password: "",
   });
 
+  const [showPassword, setShowPassword] = useState(false);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -32,9 +34,9 @@ export default function BrokerSignupPage() {
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Registration failed");
-
+// console.log(data,"data shiowing")
       localStorage.setItem("accessToken", data.accessToken);
-      localStorage.setItem("brokerId", data._id);
+      localStorage.setItem("brokerId", data.broker._id);
 
       window.location.href = `/broker/dashboard`;
     } catch (err: unknown) {
@@ -93,18 +95,54 @@ export default function BrokerSignupPage() {
             </div>
 
             {/* Password */}
-            <div className="relative">
-              <Lock className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
-              <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
-              />
-            </div>
+           {/* Password */}
+<div className="relative">
+  <Lock className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
+  <input
+    type={showPassword ? "text" : "password"}
+    name="password"
+    placeholder="Password"
+    value={formData.password}
+    onChange={handleChange}
+    required
+    className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+  />
+
+  {/* Eye Icon — appears only when user types something */}
+  {formData.password && (
+    <button
+      type="button"
+      onMouseDown={() => setShowPassword(true)}
+      onMouseUp={() => setShowPassword(false)}
+      onMouseLeave={() => setShowPassword(false)}
+      onTouchStart={() => setShowPassword(true)}
+      onTouchEnd={() => setShowPassword(false)}
+      className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
+      aria-label="Show password"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.8}
+        stroke="currentColor"
+        className="w-5 h-5"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.432 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"
+        />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+        />
+      </svg>
+    </button>
+  )}
+</div>
+
 
             {/* CTA */}
             <button
