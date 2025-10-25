@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 interface Broker {
   _id: string;
@@ -53,6 +54,11 @@ export default function BrokerDashboardPage() {
   const [pagination, setPagination] = useState<Pagination | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  // delete api implementation
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [showModal, setShowModal] = useState(false)
   const router = useRouter();
 
   // --- Helpers ---
@@ -69,6 +75,38 @@ export default function BrokerDashboardPage() {
     if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   };
+
+  const handleDelete = async () => {
+  if (!deleteId) return;
+  setDeleting(true);
+
+  try {
+    const res = await fetch(`/api/properties/delete/${deleteId}`, {
+      method: "DELETE",
+    });
+    const data = await res.json();
+
+    if (res.ok) {
+      // ✅ Remove the deleted property from state
+      setProperties((prev) => prev.filter((p) => p._id !== deleteId));
+
+      // ✅ Close modal & reset state
+      setShowModal(false);
+      setDeleteId(null);
+
+      // Optional: toast or alert feedback
+      toast.success("Property deleted successfully!");
+    } else {
+      alert(data.message || "Failed to delete property ❌");
+    }
+  } catch (error) {
+    console.error("Error deleting property:", error);
+    alert("Something went wrong while deleting");
+  } finally {
+    setDeleting(false);
+  }
+};
+
 
   // --- Load brokerId from localStorage (client-only) ---
   useEffect(() => {
@@ -192,6 +230,7 @@ export default function BrokerDashboardPage() {
             key={p._id}
             className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden transition-transform hover:translate-y-[-4px] hover:shadow-lg"
           >
+            
             {/* Cover */}
             <div className="relative w-full h-56">
               <Image
@@ -203,6 +242,20 @@ export default function BrokerDashboardPage() {
                 priority={false}
               />
             </div>
+
+            <button
+  onClick={() => {
+    setDeleteId(p._id);
+    setShowModal(true);
+  }}
+  className="absolute top-3 right-3 bg-white/80 hover:bg-red-50 text-red-600 rounded-full p-2 shadow-sm"
+  title="Delete property"
+>
+  <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+  </svg>
+</button>
+
 
             {/* Content */}
             <div className="p-4">
@@ -279,6 +332,35 @@ export default function BrokerDashboardPage() {
           </button>
         </div>
       )}
+
+      {showModal && (
+  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+    <div className="bg-white rounded-xl p-6 shadow-lg w-80 text-center">
+      <h3 className="text-lg font-semibold text-gray-900">Confirm Delete</h3>
+      <p className="text-sm text-gray-600 mt-2">
+        Are you sure you want to delete this property? This action cannot be undone.
+      </p>
+
+      <div className="mt-4 flex justify-center gap-3">
+        <button
+          onClick={() => setShowModal(false)}
+          className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200"
+          disabled={deleting}
+        >
+          Cancel
+        </button>
+        <button
+          onClick={handleDelete}
+          className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 disabled:opacity-50"
+          disabled={deleting}
+        >
+          {deleting ? "Deleting..." : "Delete"}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 }
