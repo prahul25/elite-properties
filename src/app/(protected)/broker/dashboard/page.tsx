@@ -108,6 +108,36 @@ export default function BrokerDashboardPage() {
 };
 
 
+const handleToggleStatus = async (propertyId: string, currentStatus: string) => {
+  try {
+    const newStatus = currentStatus === "active" ? "inactive" : "active";
+
+    const res = await fetch(`/api/properties/status/${propertyId}`, {
+      method: "PATCH"
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      toast.error(data.message || "Failed to update status");
+      return;
+    }
+
+    // ✅ Update status locally without re-fetching all properties
+    setProperties((prev) =>
+      prev.map((p) =>
+        p._id === propertyId ? { ...p, status: newStatus } : p
+      )
+    );
+
+    toast.success(`Property ${newStatus === "active" ? "activated" : "deactivated"} successfully`);
+  } catch (error) {
+    console.error("Toggle status error:", error);
+    toast.error("Something went wrong while updating status");
+  }
+};
+
+
   // --- Load brokerId from localStorage (client-only) ---
   useEffect(() => {
     try {
@@ -271,6 +301,17 @@ export default function BrokerDashboardPage() {
                 <div className="text-right">
                   <div className="text-indigo-600 font-semibold">{formatPrice(p.price)}</div>
                   <div className="text-xs text-gray-500 mt-1">{p.status}</div>
+                  <button
+  onClick={() => handleToggleStatus(p._id, p.status)}
+  className={`mt-3 px-3 py-1 text-sm rounded-lg font-medium transition ${
+    p.status === "active"
+      ? "bg-red-100 text-red-700 hover:bg-red-200"
+      : "bg-green-100 text-green-700 hover:bg-green-200"
+  }`}
+>
+  {p.status === "active" ? "Deactivate" : "Activate"}
+</button>
+
                 </div>
               </div>
 
