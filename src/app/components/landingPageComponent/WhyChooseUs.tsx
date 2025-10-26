@@ -2,6 +2,7 @@
 import React from "react";
 import { motion, easeInOut } from "framer-motion";
 import { MapPin, User, DollarSign, Headphones } from "lucide-react";
+import Image from "next/image";
 
 // Animation config
 const transitionConfig = {
@@ -63,10 +64,13 @@ export default function WhyChooseUs() {
             variants={boxVariants}
             className="relative rounded-lg overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300"
           >
-            <img
+            <Image
               src="/whyChoseUs.png"
               alt="Team member"
+              width={448}
+              height={560}
               className="rounded-lg shadow-xl max-w-sm lg:max-w-md transition-transform duration-500 hover:scale-105"
+              priority
             />
           </motion.div>
 

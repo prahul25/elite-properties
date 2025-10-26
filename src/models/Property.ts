@@ -25,7 +25,7 @@ export interface Property extends Document {
   images: string[];
   brokerId: mongoose.Types.ObjectId;
 
-  status: "Active" | "Sold" | "Rented";
+  status: "Active" | "Sold" | "Rented" | "Disabled";
   createdAt: Date;
   updatedAt: Date;
 }
@@ -80,7 +80,7 @@ const PropertySchema: Schema<Property> = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["Active", "Sold", "Rented"],
+      enum: ["Active", "Sold", "Rented", "Disabled"],
       default: "Active",
     },
   },
