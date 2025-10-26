@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { Edit } from "lucide-react";
 
 interface Broker {
   _id: string;
@@ -272,6 +273,13 @@ const handleToggleStatus = async (propertyId: string, currentStatus: string) => 
                 priority={false}
               />
             </div>
+             <button
+    onClick={() => router.push(`/broker/edit-property/${p._id}`)}
+    className="p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition"
+    title="Edit Property"
+  >
+    <Edit size={16} />
+  </button>
 
             <button
   onClick={() => {
